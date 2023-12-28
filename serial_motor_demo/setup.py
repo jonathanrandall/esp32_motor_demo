@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'serial_motor_demo'
+package_name = 'esp32_motor_demo'
 
 setup(
     name=package_name,
@@ -20,8 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'gui = serial_motor_demo.gui:main',
-            'driver = serial_motor_demo.driver:main'
+            'gui = esp32_motor_demo.gui:main',
+            'driver = esp32_motor_demo.driver:main'
         ],
     },
 )

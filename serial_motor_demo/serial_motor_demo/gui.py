@@ -4,9 +4,9 @@ import time
 from tkinter import *
 import math
 
-from serial_motor_demo_msgs.msg import MotorCommand
-from serial_motor_demo_msgs.msg import MotorVels
-from serial_motor_demo_msgs.msg import EncoderVals
+from esp32_motor_demo_msgs.msg import MotorCommand
+from esp32_motor_demo_msgs.msg import MotorVels
+from esp32_motor_demo_msgs.msg import EncoderVals
 
 
 class MotorGui(Node):
