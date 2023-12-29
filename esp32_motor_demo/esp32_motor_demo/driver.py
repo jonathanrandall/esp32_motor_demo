@@ -9,9 +9,7 @@ import math
 import serial
 from threading import Lock
 
-class conn_esp32:
-    def __init__(self, esp32_ip):
-        self.esp32_ip = esp32_ip
+
         
 
 class MotorDriver(Node):
@@ -87,26 +85,34 @@ class MotorDriver(Node):
     
     def send_pwm_motor_command(self, mot_1_pwm, mot_2_pwm):
         esp32_ip = self.esp32_ip
-        self.send_command(esp32_ip+f"/control?var=o&val=({int(mot_1_pwm)} {int(mot_2_pwm)})")
-        #self.send_command(esp32_ip+f"o {int(mot_1_pwm)} {int(mot_2_pwm)}")
+        requests.get(esp32_ip+f"/control?var=o&val=({int(mot_1_pwm)}_{int(mot_2_pwm)})")
+        #self.send_command(f"o {int(mot_1_pwm)} {int(mot_2_pwm)}")
 
     def send_feedback_motor_command(self, mot_1_ct_per_loop, mot_2_ct_per_loop):
-        self.send_command(f"m {int(mot_1_ct_per_loop)} {int(mot_2_ct_per_loop)}")
+        esp32_ip = self.esp32_ip
+        requests.get(esp32_ip+f"/control?var=o&val=({int(mot_1_ct_per_loop)}_{int(mot_2_ct_per_loop)})")
+        #self.send_command(f"m {int(mot_1_ct_per_loop)} {int(mot_2_ct_per_loop)}")
 
     def send_encoder_read_command(self):
-        resp = self.send_command(f"e")
+        esp32_ip = self.esp32_ip
+        resp=requests.get(esp32_ip+f"/control?var=e&val=({int(0)}_{int(0)})")
+        #resp = list(map(int,((response.content).decode('utf-8')).split()))
+        
+        #resp = self.send_command(f"e")
         if resp:
-            return [int(raw_enc) for raw_enc in resp.split()]
+            return list(map(int,((resp.content).decode('utf-8')).split()))
+            #return [int(raw_enc) for raw_enc in resp.split()]
         return []
 
 
     # More user-friendly functions
+    # check
 
     def motor_command_callback(self, motor_command):
         if (motor_command.is_pwm):
             self.send_pwm_motor_command(motor_command.mot_1_req_rad_sec, motor_command.mot_2_req_rad_sec)
         else:
-            # counts per loop = req rads/sec X revs/rad X counts/rev X secs/loop 
+            # counts per loop = req rads/sec X revs/rad X counts/rev X secs/loop
             scaler = (1 / (2*math.pi)) * self.get_parameter('encoder_cpr').value * (1 / self.get_parameter('loop_rate').value)
             mot1_ct_per_loop = motor_command.mot_1_req_rad_sec * scaler
             mot2_ct_per_loop = motor_command.mot_2_req_rad_sec * scaler
@@ -170,8 +176,8 @@ class MotorDriver(Node):
         finally:
             self.mutex.release()
 
-    def close_conn(self):
-        self.conn.close()
+    # def close_conn(self):
+    #     self.conn.close()
 
 
 
@@ -187,7 +193,7 @@ def main(args=None):
         motor_driver.check_encoders()
 
 
-    motor_driver.close_conn()
+    #motor_driver.close_conn()
     motor_driver.destroy_node()
     rclpy.shutdown()
 
