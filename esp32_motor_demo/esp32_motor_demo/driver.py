@@ -1,4 +1,5 @@
 import rclpy
+import requests
 from rclpy.node import Node
 from esp32_motor_demo_msgs.msg import MotorCommand
 from esp32_motor_demo_msgs.msg import MotorVels
@@ -8,7 +9,10 @@ import math
 import serial
 from threading import Lock
 
-
+class conn_esp32:
+    def __init__(self, esp32_ip):
+        self.esp32_ip = esp32_ip
+        
 
 class MotorDriver(Node):
 
@@ -41,6 +45,8 @@ class MotorDriver(Node):
         if (self.debug_serial_cmds):
             print("Serial debug enabled")
 
+        self.declare_parameter('esp32_ip', value="http://192.168.1.211")
+        self.esp32_ip = self.get_parameter('esp32_ip').value
 
 
         # Setup topics & services
@@ -69,9 +75,9 @@ class MotorDriver(Node):
 
         # Open serial comms
 
-        print(f"Connecting to port {self.serial_port} at {self.baud_rate}.")
-        self.conn = serial.Serial(self.serial_port, self.baud_rate, timeout=1.0)
-        print(f"Connected to {self.conn}")
+        #print(f"Connecting to port {self.serial_port} at {self.baud_rate}.")
+        #self.conn = serial.Serial(self.serial_port, self.baud_rate, timeout=1.0)
+        #print(f"Connected to {self.conn}")
         
 
         
@@ -80,7 +86,9 @@ class MotorDriver(Node):
     # Raw serial commands
     
     def send_pwm_motor_command(self, mot_1_pwm, mot_2_pwm):
-        self.send_command(f"o {int(mot_1_pwm)} {int(mot_2_pwm)}")
+        esp32_ip = self.esp32_ip
+        self.send_command(esp32_ip+f"/control?var=o&val=({int(mot_1_pwm)} {int(mot_2_pwm)})")
+        #self.send_command(esp32_ip+f"o {int(mot_1_pwm)} {int(mot_2_pwm)}")
 
     def send_feedback_motor_command(self, mot_1_ct_per_loop, mot_2_ct_per_loop):
         self.send_command(f"m {int(mot_1_ct_per_loop)} {int(mot_2_ct_per_loop)}")
