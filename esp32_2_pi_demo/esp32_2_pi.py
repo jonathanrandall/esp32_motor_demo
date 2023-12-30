@@ -2,7 +2,7 @@ import requests
 URL_esp32 = "http://192.168.1.211"
 mot1 = 300
 mot2 = 3
-str1=URL_esp32 + f"/control?var=o&val={int(mot1)}_{int(mot2)}"
+str1=URL_esp32 + f"/control?var=e&val={int(mot1)}_{int(mot2)}"
 
 
 
