@@ -20,7 +20,7 @@ class MotorDriver(Node):
 
         # Setup parameters
 
-        self.declare_parameter('encoder_cpr', value=0)
+        self.declare_parameter('encoder_cpr', value=753.2)
         if (self.get_parameter('encoder_cpr').value == 0):
             print("WARNING! ENCODER CPR SET TO 0!!")
 
@@ -90,7 +90,7 @@ class MotorDriver(Node):
 
     def send_feedback_motor_command(self, mot_1_ct_per_loop, mot_2_ct_per_loop):
         esp32_ip = self.esp32_ip
-        requests.get(esp32_ip+f"/control?var=o&val=({int(mot_1_ct_per_loop)}_{int(mot_2_ct_per_loop)})")
+        requests.get(esp32_ip+f"/control?var=m&val=({int(mot_1_ct_per_loop)}_{int(mot_2_ct_per_loop)})")
         #self.send_command(f"m {int(mot_1_ct_per_loop)} {int(mot_2_ct_per_loop)}")
 
     def send_encoder_read_command(self):
@@ -154,7 +154,7 @@ class MotorDriver(Node):
         self.mutex.acquire()
         try:
             cmd_string += "\r"
-            self.conn.write(cmd_string.encode("utf-8"))
+            #self.conn.write(cmd_string.encode("utf-8"))
             if (self.debug_serial_cmds):
                 print("Sent: " + cmd_string)
 
@@ -162,7 +162,7 @@ class MotorDriver(Node):
             c = ''
             value = ''
             while c != '\r':
-                c = self.conn.read(1).decode("utf-8")
+                #c = self.conn.read(1).decode("utf-8")
                 if (c == ''):
                     print("Error: Serial timeout on command: " + cmd_string)
                     return ''
