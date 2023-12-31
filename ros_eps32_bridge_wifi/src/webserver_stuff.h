@@ -72,15 +72,15 @@ void handleRequest(AsyncWebServerRequest *request)
    
     sscanf(valValue.c_str(), "%d_%d", &arg1, &arg2);
 
-    Serial.print("value sent: ");
-    Serial.println(valValue.c_str());
+    // Serial.print("value sent: ");
+    // Serial.println(valValue.c_str());
 
-    Serial.println(variable);
-    Serial.print("Received values: ");
-    Serial.print("arg1 = ");
-    Serial.print(arg1);
-    Serial.print(", arg2 = ");
-    Serial.println(arg2);
+    // Serial.println(variable);
+    // Serial.print("Received values: ");
+    // Serial.print("arg1 = ");
+    // Serial.print(arg1);
+    // Serial.print(", arg2 = ");
+    // Serial.println(arg2);
 
     // because variable is type string and strcmp expects const char *
     // we need to use variable.c_str()
