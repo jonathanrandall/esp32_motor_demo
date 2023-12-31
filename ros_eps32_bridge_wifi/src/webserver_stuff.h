@@ -27,6 +27,7 @@ IPAddress primaryDNS(8, 8, 8, 8);   // optional
 IPAddress secondaryDNS(8, 8, 4, 4); // optional
 
 AsyncWebServer server(80);
+void handleRequest(AsyncWebServerRequest *request);
 
 void init_wifi()
 {

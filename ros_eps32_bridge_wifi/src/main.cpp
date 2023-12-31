@@ -7,8 +7,6 @@
 
 
 
-
-
 int arg = 0;
 int idx = 0;
 
@@ -151,71 +149,16 @@ void setup()
 void loop()
 {
   // put your main code here, to run repeatedly:
-  while (Serial.available() > 0)
-  {
-    chr = Serial.read();
-    // Serial.println(chr);
-
-    // Terminate a command with a CR
-    if (chr == 13)
-    {
-      // Serial.println("here");
-      if (arg == 1)
-        argv1[idx] = NULL;
-      else if (arg == 2)
-        argv2[idx] = NULL;
-      // Serial.println(cmd);
-      runCommand();
-      // Serial.println("reseting");
-      resetCommand();
-    }
-    else if (chr == ' ')
-    {
-      // Serial.println("here now");
-      // Step through the arguments
-      if (arg == 0)
-        arg = 1;
-      else if (arg == 1)
-      {
-        argv1[idx] = NULL;
-        arg = 2;
-        idx = 0;
-      }
-      continue;
-    }
-    else
-    {
-      if (arg == 0)
-      {
-        // The first arg is the single-letter command
-        cmd = chr;
-      }
-      else if (arg == 1)
-      {
-        // Subsequent arguments can be more than one character
-        argv1[idx] = chr;
-        idx++;
-      }
-      else if (arg == 2)
-      {
-        argv2[idx] = chr;
-        idx++;
-      }
-    }
-  }
-
-  // If we are using base control, run a PID calculation at the appropriate intervals
-
   if (millis() > nextPID)
   {
     updatePID();
-    nextPID += PID_INTERVAL;
+    nextPID =millis()+ PID_INTERVAL;
   }
 
   // Check to see if we have exceeded the auto-stop interval
   if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL)
   {
-    ;
+    
     setMotorSpeeds(0, 0);
     moving = 0;
   }
