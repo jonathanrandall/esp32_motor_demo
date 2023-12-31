@@ -68,8 +68,12 @@ void handleRequest(AsyncWebServerRequest *request)
     String valValue = request->arg("val");
 
     // Parse the string into two integers
-    int arg1, arg2;
+    long arg1, arg2;
+   
     sscanf(valValue.c_str(), "%d_%d", &arg1, &arg2);
+
+    Serial.print("value sent: ");
+    Serial.println(valValue.c_str());
 
     Serial.println(variable);
     Serial.print("Received values: ");
