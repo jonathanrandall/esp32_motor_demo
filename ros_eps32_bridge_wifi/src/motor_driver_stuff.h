@@ -54,12 +54,12 @@ void setMotorSpeed(int i, int spd)
     {
       digitalWrite(LEFT_MOTOR_DIR, 0);
     }
-    // ledcWrite(mtr_left_pwm_channel, spd);
-    if (spd > 0)
-    {
-      Serial.print("left motor: ");
-      Serial.println(spd);
-    }
+    ledcWrite(mtr_left_pwm_channel, spd);
+    // if (spd > 0)
+    // {
+    //   Serial.print("left motor: ");
+    //   Serial.println(spd);
+    // }
   }
   else /*if (i == RIGHT) //no need for condition*/
   {
@@ -71,12 +71,12 @@ void setMotorSpeed(int i, int spd)
     {
       digitalWrite(RIGHT_MOTOR_DIR, 1);
     }
-    // ledcWrite(mtr_right_pwm_channel, spd);
-    if (spd > 0)
-    {
-      Serial.print("right motor: ");
-      Serial.println(spd);
-    }
+    ledcWrite(mtr_right_pwm_channel, spd);
+    // if (spd > 0)
+    // {
+    //   Serial.print("right motor: ");
+    //   Serial.println(spd);
+    // }
   }
 }
 
@@ -85,10 +85,10 @@ void setMotorSpeeds(int leftSpeed, int rightSpeed)
   // setMotorSpeed(LEFT, leftSpeed);
   //  ledcWrite(mtr_right_pwm_channel, rightSpeed);
   //  ledcWrite(mtr_left_pwm_channel, leftSpeed);
-  // setMotorSpeed(RIGHT, rightSpeed);
-  // setMotorSpeed(LEFT, leftSpeed);
-  ledcWrite(mtr_right_pwm_channel, rightSpeed);
-  ledcWrite(mtr_left_pwm_channel, leftSpeed);
+  setMotorSpeed(RIGHT, rightSpeed);
+  setMotorSpeed(LEFT, leftSpeed);
+  // ledcWrite(mtr_right_pwm_channel, rightSpeed);
+  // ledcWrite(mtr_left_pwm_channel, leftSpeed);
 }
 
 #endif
