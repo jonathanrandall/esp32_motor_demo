@@ -84,18 +84,24 @@ class MotorDriver(Node):
     # Raw serial commands
     
     def send_pwm_motor_command(self, mot_1_pwm, mot_2_pwm):
+        self.mutex.acquire()
         esp32_ip = self.esp32_ip
         requests.get(esp32_ip+f"/control?var=o&val={int(mot_1_pwm)}_{int(mot_2_pwm)}")
+        self.mutex.release()
         #self.send_command(f"o {int(mot_1_pwm)} {int(mot_2_pwm)}")
 
     def send_feedback_motor_command(self, mot_1_ct_per_loop, mot_2_ct_per_loop):
+        self.mutex.acquire()
         esp32_ip = self.esp32_ip
         requests.get(esp32_ip+f"/control?var=m&val={int(mot_1_ct_per_loop)}_{int(mot_2_ct_per_loop)}")
+        self.mutex.release()
         #self.send_command(f"m {int(mot_1_ct_per_loop)} {int(mot_2_ct_per_loop)}")
 
     def send_encoder_read_command(self):
+        self.mutex.acquire()
         esp32_ip = self.esp32_ip
         resp=requests.get(esp32_ip+f"/control?var=e&val={int(0)}_{int(0)}")
+        self.mutex.release()
         #resp = list(map(int,((response.content).decode('utf-8')).split()))
         
         #resp = self.send_command(f"e")
