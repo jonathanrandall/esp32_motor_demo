@@ -20,7 +20,7 @@ class MotorDriver(Node):
 
         # Setup parameters
 
-        self.declare_parameter('encoder_cpr', value=753.2)
+        self.declare_parameter('encoder_cpr', value=753)
         if (self.get_parameter('encoder_cpr').value == 0):
             print("WARNING! ENCODER CPR SET TO 0!!")
 
@@ -85,17 +85,17 @@ class MotorDriver(Node):
     
     def send_pwm_motor_command(self, mot_1_pwm, mot_2_pwm):
         esp32_ip = self.esp32_ip
-        requests.get(esp32_ip+f"/control?var=o&val=({int(mot_1_pwm)}_{int(mot_2_pwm)})")
+        requests.get(esp32_ip+f"/control?var=o&val={int(mot_1_pwm)}_{int(mot_2_pwm)}")
         #self.send_command(f"o {int(mot_1_pwm)} {int(mot_2_pwm)}")
 
     def send_feedback_motor_command(self, mot_1_ct_per_loop, mot_2_ct_per_loop):
         esp32_ip = self.esp32_ip
-        requests.get(esp32_ip+f"/control?var=m&val=({int(mot_1_ct_per_loop)}_{int(mot_2_ct_per_loop)})")
+        requests.get(esp32_ip+f"/control?var=m&val={int(mot_1_ct_per_loop)}_{int(mot_2_ct_per_loop)}")
         #self.send_command(f"m {int(mot_1_ct_per_loop)} {int(mot_2_ct_per_loop)}")
 
     def send_encoder_read_command(self):
         esp32_ip = self.esp32_ip
-        resp=requests.get(esp32_ip+f"/control?var=e&val=({int(0)}_{int(0)})")
+        resp=requests.get(esp32_ip+f"/control?var=e&val={int(0)}_{int(0)}")
         #resp = list(map(int,((response.content).decode('utf-8')).split()))
         
         #resp = self.send_command(f"e")
