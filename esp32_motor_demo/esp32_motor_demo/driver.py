@@ -87,8 +87,11 @@ class MotorDriver(Node):
         self.mutex.acquire()
         esp32_ip = self.esp32_ip
         requests.get(esp32_ip+f"/control?var=o&val={int(mot_1_pwm)}_{int(mot_2_pwm)}")
+        #val=100_100
         self.mutex.release()
         #self.send_command(f"o {int(mot_1_pwm)} {int(mot_2_pwm)}")
+        #o 100 100 
+        
 
     def send_feedback_motor_command(self, mot_1_ct_per_loop, mot_2_ct_per_loop):
         self.mutex.acquire()
