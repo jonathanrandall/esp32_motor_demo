@@ -7,6 +7,7 @@
 #include "encoder_stuff.h"
 #include "motor_driver_stuff.h"
 #include "pid_stuff.h"
+#include "commands.h"
 
 // Replace with your network credentials
 const char *ssid = "";
@@ -27,52 +28,93 @@ IPAddress secondaryDNS(8, 8, 4, 4); // optional
 
 AsyncWebServer server(80);
 
-void handleRequest(AsyncWebServerRequest *request)
+void init_wifi()
 {
-  unsigned long int tmp1, tmp2;
-  tmp1 = millis();
-  /// control?var=variable&val=10_20
+    if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS))
+    {
+        Serial.println("STA Failed to configure");
+    }
+    WiFi.mode(WIFI_AP_STA); // need this mode to use esp now
 
-  String variable = request->arg("var");
-  String valValue = request->arg("val");
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("");
+    Serial.println("WiFi connected");
 
-  // Parse the string into two integers
-  int arg1, arg2;
-  sscanf(valValue.c_str(), "%d_%d", &arg1, &arg2);
+    Serial.print("Go to: http://");
+    Serial.println(WiFi.localIP());
 
-  Serial.println(variable);
-  Serial.print("Received values: ");
-  Serial.print("arg1 = ");
-  Serial.print(arg1);
-  Serial.print(", arg2 = ");
-  Serial.println(arg2);
+    server.on("/control", HTTP_GET, handleRequest);
 
-  // because variable is type string and strcmp expects const char *
-  // we need to use variable.c_str()
-  String resp;
-  tmp2 = millis();
-  if (!strcmp(variable.c_str(), "o"))
-  {
-    resp = String(arg1 + 10) + " " + String(arg2 + 100);
-    // 20 120
-  }
-  else if (!strcmp(variable.c_str(), "e"))
-  {
-    resp = String(tmp1) + " " + String(tmp2);
-  }
-  else if (!strcmp(variable.c_str(), "m"))
-  {
-    lastMotorCommand = millis();
-    resetPID();
-    moving = 0; // Sneaky way to temporarily disable the PID
-    
-    setMotorSpeeds(arg1, arg2);
-    resp = String(tmp1) + " " + String(tmp2);
-  }
-
-
-  request->send(200, "text/plain", resp);
+    server.begin();
 }
 
+void handleRequest(AsyncWebServerRequest *request)
+{
+    unsigned long int tmp1, tmp2;
+    tmp1 = millis();
+    /// control?var=variable&val=10_20
+
+    String variable = request->arg("var");
+    String valValue = request->arg("val");
+
+    // Parse the string into two integers
+    int arg1, arg2;
+    sscanf(valValue.c_str(), "%d_%d", &arg1, &arg2);
+
+    Serial.println(variable);
+    Serial.print("Received values: ");
+    Serial.print("arg1 = ");
+    Serial.print(arg1);
+    Serial.print(", arg2 = ");
+    Serial.println(arg2);
+
+    // because variable is type string and strcmp expects const char *
+    // we need to use variable.c_str()
+    String resp;
+    tmp2 = millis();
+    if (!strcmp(variable.c_str(), "o"))
+    {
+        lastMotorCommand = millis();
+        resetPID();
+        moving = 0; // Sneaky way to temporarily disable the PID
+
+        setMotorSpeeds(arg1, arg2);
+        resp = String(arg1) + " " + String(arg1);
+    }
+    else if (!strcmp(variable.c_str(), "e"))
+    {
+        long lft, rgt;
+        lft = readEncoder(LEFT);
+        rgt = readEncoder(RIGHT);
+        resp = String(lft) + " " + String(rgt);
+    }
+    else if (!strcmp(variable.c_str(), "m"))
+    {
+        lastMotorCommand = millis();
+        if (arg1 == 0 && arg2 == 0)
+        {
+            setMotorSpeeds(0, 0);
+            resetPID();
+            moving = 0;
+        }
+        else
+            moving = 1;
+        leftPID.TargetTicksPerFrame = arg1;
+        rightPID.TargetTicksPerFrame = arg2;
+        
+        resp = String(arg1) + " " + String(arg1);
+    }
+    else
+    {
+        resp = "-1 -1";
+    }
+
+    request->send(200, "text/plain", resp);
+}
 
 #endif
