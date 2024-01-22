@@ -70,10 +70,7 @@ void loop()
     nextPID =millis()+ PID_INTERVAL;
   }
   delay(2);
-<<<<<<< HEAD
-=======
-
->>>>>>> be610b04e16e62b780a15877dc335f6db23eb2eb
+  
   // Check to see if we have exceeded the auto-stop interval
   if ((millis() - lastMotorCommand) > 10000)
   {

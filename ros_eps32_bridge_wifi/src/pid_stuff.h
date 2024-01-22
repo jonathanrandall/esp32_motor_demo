@@ -140,9 +140,6 @@ void doPID(SetPointInfo *p)
 void updatePID()
 {
     /* Read the encoders */
-<<<<<<< HEAD
-    
-=======
     leftPID.Encoder = -1*readEncoder(LEFT);
     rightPID.Encoder = -1*readEncoder(RIGHT);
     // Serial.print("left: ");
@@ -150,7 +147,7 @@ void updatePID()
     // Serial.print("right: ");
     // Serial.println(rightPID.Encoder);
 
->>>>>>> be610b04e16e62b780a15877dc335f6db23eb2eb
+
 
     /* If we're not moving there is nothing more to do */
     if (!moving)
@@ -168,18 +165,13 @@ void updatePID()
     }
 
     
-    rightPID.Encoder = readEncoder(RIGHT);
+    
 
     /* Compute PID update for each motor */
-<<<<<<< HEAD
-    doPID(&rightPID);
-
-    leftPID.Encoder = readEncoder(LEFT);
-=======
     
->>>>>>> be610b04e16e62b780a15877dc335f6db23eb2eb
+    leftPID.Encoder = readEncoder(LEFT);
     doPID(&leftPID);
-    // rightPID.Encoder = readEncoder(RIGHT);
+    rightPID.Encoder = readEncoder(RIGHT);
     doPID(&rightPID);
     
 
