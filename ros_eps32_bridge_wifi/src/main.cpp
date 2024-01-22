@@ -37,100 +37,6 @@ void resetCommand()
   idx = 0;
 }
 
-int runCommand()
-{
-  int i = 0;
-  char *p = argv1;
-  char *str;
-  int pid_args[4];
-  arg1 = atoi(argv1);
-  arg2 = atoi(argv2);
-  // Serial.println(cmd);
-
-  switch (cmd)
-  {
-  case GET_BAUDRATE:
-    Serial.println(BAUDRATE);
-    break;
-  case ANALOG_READ:
-    // Serial.println(analogRead(arg1));
-    break;
-  case DIGITAL_READ:
-    Serial.println(digitalRead(arg1));
-    break;
-  case ANALOG_WRITE:
-    // analogWrite(arg1, arg2);
-    Serial.println("OK");
-    break;
-  case DIGITAL_WRITE:
-    if (arg2 == 0)
-      digitalWrite(arg1, LOW);
-    else if (arg2 == 1)
-      digitalWrite(arg1, HIGH);
-    Serial.println("OK");
-    break;
-  case PIN_MODE:
-    if (arg2 == 0)
-      pinMode(arg1, INPUT);
-    else if (arg2 == 1)
-      pinMode(arg1, OUTPUT);
-    Serial.println("OK");
-    break;
-  case READ_ENCODERS:
-    Serial.print(readEncoder(LEFT));
-    Serial.print(" ");
-    Serial.println(readEncoder(RIGHT));
-    break;
-  case RESET_ENCODERS:
-    resetEncoders();
-    resetPID();
-    Serial.println("OK");
-    break;
-  case MOTOR_SPEEDS:
-    /* Reset the auto stop timer */
-    lastMotorCommand = millis();
-    if (arg1 == 0 && arg2 == 0)
-    {
-      setMotorSpeeds(0, 0);
-      resetPID();
-      moving = 0;
-    }
-    else
-      moving = 1;
-    leftPID.TargetTicksPerFrame = arg1;
-    rightPID.TargetTicksPerFrame = arg2;
-    Serial.println("OK");
-    break;
-  case MOTOR_RAW_PWM:
-    /* Reset the auto stop timer */
-    lastMotorCommand = millis();
-    resetPID();
-    moving = 0; // Sneaky way to temporarily disable the PID
-    // Serial.println(arg1);
-    // Serial.println(arg2);
-    setMotorSpeeds(arg1, arg2);
-    Serial.println("OK");
-    break;
-  case UPDATE_PID:
-    while ((str = strtok_r(p, ":", &p)) != NULL)
-    {
-      pid_args[i] = atoi(str);
-      i++;
-    }
-    Kp = pid_args[0];
-    Kd = pid_args[1];
-    Ki = pid_args[2];
-    Ko = pid_args[3];
-    Serial.println("OK");
-    break;
-  default:
-    Serial.println("Invalid Command");
-    break;
-  }
-
-  return 1;
-}
-
 
 
 void setup()
@@ -138,28 +44,56 @@ void setup()
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.println("begun");
+  lastMotorCommand = millis();
 
   init_wifi();
 
   robot_setup();
   resetPID();
   init_encoders();
+
+
+  leftPID.nm = "left";
+  rightPID.nm = "right";
+
+  leftPID.TargetTicksPerFrame = 120;
+  rightPID.TargetTicksPerFrame = 120;
+  moving = 1;
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
-  if (millis() > nextPID)
+  if ((millis() > nextPID))
   {
     updatePID();
     nextPID =millis()+ PID_INTERVAL;
   }
+  delay(2);
 
   // Check to see if we have exceeded the auto-stop interval
-  if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL)
+  if ((millis() - lastMotorCommand) > 10000)
   {
+    Serial.println(lastMotorCommand);
+    Serial.println(millis());
+    Serial.println(" stopping motor for time out setting moving = 0");
     
     setMotorSpeeds(0, 0);
+    // init_encoders();
     moving = 0;
-  }
+    lastMotorCommand = millis();
+  } 
+
+  // for (int i=140; i<201;i=i+60){
+  //   setMotorSpeeds(i,i);
+  //   delay(3);
+  // }
+
+  // for (int i=201; i>140;i=i-60){
+  //   setMotorSpeeds(i,i);
+  //   delay(5);
+  // }
+
+
+  
 }

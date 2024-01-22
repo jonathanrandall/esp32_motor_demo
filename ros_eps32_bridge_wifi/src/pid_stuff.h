@@ -13,7 +13,7 @@
 
 #define BAUDRATE 9600
 
-#define PID_RATE 30 // Hz
+#define PID_RATE 10 // Hz 30
 
 #define MAX_PWM 255
 /* Convert the rate into an interval */
@@ -25,6 +25,7 @@ unsigned long nextPID = PID_INTERVAL;
 /* PID setpoint info For a Motor */
 typedef struct
 {
+    String nm;
     double TargetTicksPerFrame; // target speed in ticks per frame
     long Encoder;               // encoder count
     long PrevEnc;               // last encoder count
@@ -50,8 +51,8 @@ typedef struct
 SetPointInfo leftPID, rightPID;
 
 /* PID Parameters */
-int Kp = 20;
-int Kd = 12;
+int Kp = 20;//20;
+int Kd = 0;//12;
 int Ki = 0;
 int Ko = 50;
 
@@ -67,15 +68,16 @@ unsigned char moving = 0; // is the base in motion?
  */
 void resetPID()
 {
+    // Serial.println("resetting PID");
     leftPID.TargetTicksPerFrame = 0.0;
-    leftPID.Encoder = readEncoder(LEFT);
+    leftPID.Encoder = -1*readEncoder(LEFT);
     leftPID.PrevEnc = leftPID.Encoder;
     leftPID.output = 0;
     leftPID.PrevInput = 0;
     leftPID.ITerm = 0;
 
     rightPID.TargetTicksPerFrame = 0.0;
-    rightPID.Encoder = readEncoder(RIGHT);
+    rightPID.Encoder = -1*readEncoder(RIGHT);
     rightPID.PrevEnc = rightPID.Encoder;
     rightPID.output = 0;
     rightPID.PrevInput = 0;
@@ -89,9 +91,16 @@ void doPID(SetPointInfo *p)
     long output;
     int input;
 
+    // Serial.println((p->nm).c_str());
+
+    
     // Perror = p->TargetTicksPerFrame - (p->Encoder - p->PrevEnc);
+    // Serial.print("target: ");
+    // Serial.println(p->TargetTicksPerFrame );
     input = p->Encoder - p->PrevEnc;
     Perror = p->TargetTicksPerFrame - input;
+    // Serial.print("Perror: ");
+    // Serial.println(Perror);
 
     /*
      * Avoid derivative kick and allow tuning changes,
@@ -102,8 +111,11 @@ void doPID(SetPointInfo *p)
     //  p->PrevErr = Perror;
     output = (Kp * Perror - Kd * (input - p->PrevInput) + p->ITerm) / Ko;
     p->PrevEnc = p->Encoder;
-
+    // Serial.print("output before: ");
+    // Serial.println(output);
     output += p->output;
+    // Serial.print("output after: ");
+    // Serial.println(output);
     // Accumulate Integral error *or* Limit output.
     // Stop accumulating when output saturates
     if (output >= MAX_PWM)
@@ -117,6 +129,10 @@ void doPID(SetPointInfo *p)
         p->ITerm += Ki * Perror;
 
     p->output = output;
+    // Serial.print((p->nm).c_str());
+    // Serial.print(": ");
+    // Serial.println(p->output);
+
     p->PrevInput = input;
 }
 
@@ -124,12 +140,18 @@ void doPID(SetPointInfo *p)
 void updatePID()
 {
     /* Read the encoders */
-    leftPID.Encoder = readEncoder(LEFT);
-    rightPID.Encoder = readEncoder(RIGHT);
+    leftPID.Encoder = -1*readEncoder(LEFT);
+    rightPID.Encoder = -1*readEncoder(RIGHT);
+    // Serial.print("left: ");
+    // Serial.println(leftPID.Encoder);
+    // Serial.print("right: ");
+    // Serial.println(rightPID.Encoder);
+
 
     /* If we're not moving there is nothing more to do */
     if (!moving)
     {
+        // Serial.println("not moving");
         /*
          * Reset PIDs once, to prevent startup spikes,
          * see http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-initialization/
@@ -142,8 +164,11 @@ void updatePID()
     }
 
     /* Compute PID update for each motor */
-    doPID(&rightPID);
+    
     doPID(&leftPID);
+    // rightPID.Encoder = readEncoder(RIGHT);
+    doPID(&rightPID);
+    
 
     /* Set the motor speeds accordingly */
     setMotorSpeeds(leftPID.output, rightPID.output);
