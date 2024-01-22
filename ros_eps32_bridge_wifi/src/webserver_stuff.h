@@ -18,7 +18,7 @@ const char *ssid = "";
 const char *password = "";
 
 #define AUTO_STOP_INTERVAL 2000
-long lastMotorCommand = AUTO_STOP_INTERVAL;
+unsigned long lastMotorCommand;
 
 /// Added static IP
 // Set your Static IP address
@@ -88,6 +88,7 @@ void handleRequest(AsyncWebServerRequest *request)
     tmp2 = millis();
     if (!strcmp(variable.c_str(), "o"))
     {
+        // Serial.println("o recieved, moving set to zero");
         lastMotorCommand = millis();
         resetPID();
         moving = 0; // Sneaky way to temporarily disable the PID
@@ -98,6 +99,7 @@ void handleRequest(AsyncWebServerRequest *request)
     else if (!strcmp(variable.c_str(), "e"))
     {
         long lft, rgt;
+        lastMotorCommand = millis();
         lft = readEncoder(LEFT);
         rgt = readEncoder(RIGHT);
         resp = String(lft) + " " + String(rgt);
@@ -108,15 +110,15 @@ void handleRequest(AsyncWebServerRequest *request)
         if (arg1 == 0 && arg2 == 0)
         {
             setMotorSpeeds(0, 0);
+            // Serial.println("calling reset PID arg1 and arg2 set to zero");
             resetPID();
             moving = 0;
         }
-        else
-            moving = 1;
+        else moving = 1;
         leftPID.TargetTicksPerFrame = arg1;
         rightPID.TargetTicksPerFrame = arg2;
         
-        resp = String(arg1) + " " + String(arg1);
+        resp = String(arg1) + " " + String(arg2);
     }
     else
     {

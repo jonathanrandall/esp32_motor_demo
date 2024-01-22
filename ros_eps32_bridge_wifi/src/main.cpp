@@ -44,28 +44,59 @@ void setup()
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.println("begun");
+  lastMotorCommand = millis();
 
   init_wifi();
 
   robot_setup();
   resetPID();
   init_encoders();
+
+
+  leftPID.nm = "left";
+  rightPID.nm = "right";
+
+  leftPID.TargetTicksPerFrame = 120;
+  rightPID.TargetTicksPerFrame = 120;
+  moving = 1;
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
-  if (millis() > nextPID)
+  if ((millis() > nextPID))
   {
     updatePID();
     nextPID =millis()+ PID_INTERVAL;
   }
   delay(2);
+<<<<<<< HEAD
+=======
+
+>>>>>>> be610b04e16e62b780a15877dc335f6db23eb2eb
   // Check to see if we have exceeded the auto-stop interval
-  if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL)
+  if ((millis() - lastMotorCommand) > 10000)
   {
+    Serial.println(lastMotorCommand);
+    Serial.println(millis());
+    Serial.println(" stopping motor for time out setting moving = 0");
     
     setMotorSpeeds(0, 0);
+    // init_encoders();
     moving = 0;
-  }
+    lastMotorCommand = millis();
+  } 
+
+  // for (int i=140; i<201;i=i+60){
+  //   setMotorSpeeds(i,i);
+  //   delay(3);
+  // }
+
+  // for (int i=201; i>140;i=i-60){
+  //   setMotorSpeeds(i,i);
+  //   delay(5);
+  // }
+
+
+  
 }
