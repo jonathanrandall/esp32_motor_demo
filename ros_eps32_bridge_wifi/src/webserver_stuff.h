@@ -10,12 +10,12 @@
 #include "commands.h"
 
 //wifi credentials are in here
-#include "wifi_p.h"
+// #include "wifi_p.h"
 
 // Replace with your network credentials
 //I've included mine in the wifi_p.h file
-// const char *ssid = "";
-// const char *password = "";
+const char *ssid = "";
+const char *password = "";
 
 #define AUTO_STOP_INTERVAL 2000
 long lastMotorCommand = AUTO_STOP_INTERVAL;

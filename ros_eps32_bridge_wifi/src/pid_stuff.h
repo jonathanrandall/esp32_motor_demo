@@ -50,8 +50,8 @@ typedef struct
 SetPointInfo leftPID, rightPID;
 
 /* PID Parameters */
-int Kp = 20;
-int Kd = 12;
+int Kp = 15;//20;
+int Kd = 6; //12;
 int Ki = 0;
 int Ko = 50;
 
@@ -124,8 +124,7 @@ void doPID(SetPointInfo *p)
 void updatePID()
 {
     /* Read the encoders */
-    leftPID.Encoder = readEncoder(LEFT);
-    rightPID.Encoder = readEncoder(RIGHT);
+    
 
     /* If we're not moving there is nothing more to do */
     if (!moving)
@@ -141,8 +140,13 @@ void updatePID()
         return;
     }
 
+    
+    rightPID.Encoder = readEncoder(RIGHT);
+
     /* Compute PID update for each motor */
     doPID(&rightPID);
+
+    leftPID.Encoder = readEncoder(LEFT);
     doPID(&leftPID);
 
     /* Set the motor speeds accordingly */
