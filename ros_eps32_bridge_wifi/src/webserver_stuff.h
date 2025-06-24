@@ -14,7 +14,7 @@
 
 // Replace with your network credentials
 //I've included mine in the wifi_p.h file
-const char *ssid = "";
+const char *ssid = "WiFi-C5BF";
 const char *password = "";
 
 #define AUTO_STOP_INTERVAL 2000
